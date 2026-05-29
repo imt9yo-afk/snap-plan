@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SnapPlan — Floor Plans & Measured Surveys</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --white:#ffffff;
+  --off:#f8f7f5;
+  --light:#f1eeea;
+  --orange:#f26522;
+  --orange-dark:#d4541a;
+  --orange-light:#fff4ee;
+  --orange-mid:#fde5d4;
+  --ink:#0f0f0f;
+  --mid:#666;
+  --border:#e5e2dc;
+  --dark:#181818;
+  --r:12px;
+  --shadow:0 4px 24px rgba(0,0,0,0.07);
+  --shadow-lg:0 16px 56px rgba(0,0,0,0.12);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Manrope',sans-serif;background:var(--white);color:var(--ink);overflow-x:hidden;line-height:1.6;font-size:16px;-webkit-font-smoothing:antialiased}
+
+/* ── TYPOGRAPHY ── */
+h1,h2,h3,h4,h5{font-family:'Manrope',sans-serif;font-weight:800;letter-spacing:-0.025em;line-height:1.1}
+h1{font-size:clamp(2.8rem,5vw,5rem)}
+h2{font-size:clamp(2rem,3.5vw,3rem);margin-bottom:0.8rem}
+h3{font-size:1.25rem;font-weight:700;letter-spacing:-0.01em}
+h4{font-size:0.95rem;font-weight:700}
+p{font-weight:400;line-height:1.75}
+.accent{color:var(--orange)}
+.sec-tag{display:inline-flex;align-items:center;gap:0.5rem;font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);margin-bottom:0.9rem}
+.sec-tag::before{content:'';width:18px;height:2px;background:var(--orange);border-radius:2px}
+.sec-sub{font-size:1rem;color:var(--mid);max-width:520px;line-height:1.8;margin-bottom:2.5rem}
+
+/* ── BUTTONS ── */
+.btn-primary{display:inline-flex;align-items:center;gap:0.5rem;background:var(--orange);color:#fff;padding:0.85rem 2rem;font-family:'Manrope',sans-serif;font-weight:700;font-size:0.88rem;border:none;cursor:pointer;border-radius:8px;text-decoration:none;transition:all 0.18s;box-shadow:0 4px 18px rgba(242,101,34,0.3)}
+.btn-primary:hover{background:var(--orange-dark);transform:translateY(-2px);box-shadow:0 8px 28px rgba(242,101,34,0.35)}
+.btn-outline{display:inline-flex;align-items:center;gap:0.5rem;background:transparent;color:var(--ink);padding:0.85rem 2rem;font-family:'Manrope',sans-serif;font-weight:600;font-size:0.88rem;border:1.5px solid var(--border);cursor:pointer;border-radius:8px;text-decoration:none;transition:all 0.18s}
+.btn-outline:hover{border-color:var(--ink);background:var(--light)}
+.btn-white{display:inline-flex;align-items:center;gap:0.5rem;background:#fff;color:var(--orange);padding:0.95rem 2.5rem;font-family:'Manrope',sans-serif;font-weight:700;font-size:0.9rem;border:none;cursor:pointer;border-radius:8px;text-decoration:none;transition:all 0.15s;box-shadow:0 4px 20px rgba(0,0,0,0.15)}
+.btn-white:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,0.2)}
+.btn-ghost{display:inline-flex;align-items:center;gap:0.5rem;background:rgba(255,255,255,0.15);color:#fff;padding:0.85rem 2rem;font-family:'Manrope',sans-serif;font-weight:600;font-size:0.88rem;border:1.5px solid rgba(255,255,255,0.3);cursor:pointer;border-radius:8px;text-decoration:none;transition:all 0.18s}
+.btn-ghost:hover{background:rgba(255,255,255,0.25)}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:300;background:var(--orange);padding:0 2.5rem;display:flex;align-items:center;justify-content:space-between;height:68px;box-shadow:0 2px 16px rgba(242,101,34,0.25)}
+.logo{font-family:'Manrope',sans-serif;font-size:1.5rem;font-weight:800;color:#fff;text-decoration:none;letter-spacing:-0.03em;flex-shrink:0}
+.logo .logo-snap{color:#fff}
+.logo .logo-plan{color:rgba(255,255,255,0.72)}
+.nav-links{display:flex;align-items:center;gap:0.15rem;margin-left:2rem}
+.nav-links a{font-size:0.83rem;font-weight:700;text-decoration:none;color:rgba(255,255,255,0.88);padding:0.5rem 1rem;border-radius:6px;transition:all 0.18s;white-space:nowrap}
+.nav-links a:hover{color:#fff;background:rgba(255,255,255,0.15)}
+/* dropdown */
+.nav-dropdown{position:relative}
+.nav-dropdown>a{display:flex;align-items:center;gap:0.35rem}
+.nav-dropdown>a::after{content:'▾';font-size:0.7rem;opacity:0.75;transition:transform 0.18s}
+.nav-dropdown:hover>a::after{transform:rotate(180deg)}
+.dropdown-menu{position:absolute;top:calc(100% + 8px);left:0;min-width:220px;background:#fff;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,0.15);padding:0.5rem;opacity:0;pointer-events:none;transform:translateY(-6px);transition:opacity 0.18s,transform 0.18s;z-index:400}
+.nav-dropdown:hover .dropdown-menu{opacity:1;pointer-events:all;transform:translateY(0)}
+.dropdown-menu a{display:flex;align-items:center;gap:0.7rem;padding:0.6rem 0.85rem;border-radius:6px;font-size:0.82rem;font-weight:600;color:var(--ink);text-decoration:none;transition:background 0.15s}
+.dropdown-menu a:hover{background:var(--off)}
+.dropdown-menu a span.dm-icon{font-size:1rem;width:26px;text-align:center;flex-shrink:0}
+.dropdown-divider{height:1px;background:var(--border);margin:0.4rem 0}
+/* contact us bubble */
+.nav-contact-btn{background:#fff;color:var(--orange)!important;border-radius:25px!important;padding:0.5rem 1.3rem!important;font-weight:800!important;font-size:0.82rem!important;box-shadow:0 2px 12px rgba(0,0,0,0.12);transition:all 0.18s!important;margin-left:0.5rem}
+.nav-contact-btn:hover{background:var(--orange-light)!important;transform:translateY(-1px);box-shadow:0 4px 18px rgba(0,0,0,0.18)!important}
+/* FAQ accordion */
+.faq-accordion{display:flex;flex-direction:column;gap:0.6rem}
+.faq-acc-item{background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:box-shadow 0.18s}
+.faq-acc-item:hover{box-shadow:var(--shadow)}
+.faq-acc-btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.1rem 1.4rem;background:none;border:none;cursor:pointer;font-family:'Manrope',sans-serif;font-size:0.9rem;font-weight:700;color:var(--ink);text-align:left;letter-spacing:-0.01em}
+.faq-acc-btn .faq-chevron{font-size:0.8rem;color:var(--orange);flex-shrink:0;transition:transform 0.22s;display:inline-block}
+.faq-acc-item.open .faq-chevron{transform:rotate(180deg)}
+.faq-acc-body{max-height:0;overflow:hidden;transition:max-height 0.3s ease,padding 0.3s ease}
+.faq-acc-body p{padding:0 1.4rem 1.1rem;font-size:0.84rem;color:var(--mid);line-height:1.75;font-weight:500}
+.faq-acc-item.open .faq-acc-body{max-height:300px}
+
+/* ── HERO ── */
+.hero{min-height:100vh;padding-top:68px;background:var(--white);display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
+.hero-bg{position:absolute;top:0;right:0;width:52%;height:100%;background:linear-gradient(135deg,var(--orange-light) 0%,var(--orange-mid) 100%);clip-path:polygon(10% 0,100% 0,100% 100%,0% 100%);z-index:0}
+.hero-dots{position:absolute;top:0;right:0;width:52%;height:100%;z-index:1;opacity:0.28;background-image:radial-gradient(circle,var(--orange) 1px,transparent 1px);background-size:26px 26px;clip-path:polygon(10% 0,100% 0,100% 100%,0% 100%)}
+.hero-inner{max-width:1260px;margin:0 auto;width:100%;padding:5rem 2.5rem;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;position:relative;z-index:2}
+.hero-tag{display:inline-flex;align-items:center;gap:0.5rem;background:var(--orange-light);color:var(--orange);font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.4rem 1rem;border-radius:20px;margin-bottom:1.5rem;border:1px solid rgba(242,101,34,0.2)}
+.hero h1{margin-bottom:1.4rem;color:var(--ink)}
+.hero-sub{font-size:1.05rem;color:var(--mid);max-width:460px;margin-bottom:2.2rem}
+.hero-btns{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:3rem}
+.hero-stats{display:flex;gap:2.5rem;flex-wrap:wrap}
+.hstat-n{font-size:1.9rem;font-weight:800;color:var(--ink);line-height:1;letter-spacing:-0.03em}
+.hstat-l{font-size:0.73rem;font-weight:600;color:var(--mid);margin-top:0.2rem;letter-spacing:0.01em}
+.hero-right{display:flex;flex-direction:column;gap:1rem;align-items:flex-end}
+.service-pill{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:1.4rem 1.8rem;box-shadow:0 8px 32px rgba(0,0,0,0.09);display:flex;align-items:center;gap:1.2rem;width:350px;cursor:pointer;text-decoration:none;transition:transform 0.2s,box-shadow 0.2s;animation:slideIn 0.6s ease both}
+.service-pill:nth-child(2){animation-delay:0.15s;margin-left:2rem}
+.service-pill:hover{transform:translateY(-3px);box-shadow:0 20px 50px rgba(0,0,0,0.13)}
+@keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+.sp-icon{width:50px;height:50px;border-radius:12px;background:var(--orange-light);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
+.sp-label{font-size:0.68rem;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:var(--orange);margin-bottom:0.25rem}
+.sp-title{font-size:0.95rem;font-weight:700;color:var(--ink);letter-spacing:-0.01em}
+.sp-sub{font-size:0.77rem;color:var(--mid);margin-top:0.1rem}
+.sp-arrow{margin-left:auto;color:var(--orange);font-size:1.1rem}
+
+/* ── STATS BAR ── */
+.stats-bar{background:var(--ink);padding:2.5rem 0}
+.stats-inner{max-width:1260px;margin:0 auto;padding:0 2.5rem;display:grid;grid-template-columns:repeat(4,1fr);text-align:center}
+.stat-item{padding:1.2rem;border-right:1px solid rgba(255,255,255,0.08)}
+.stat-item:last-child{border-right:none}
+.stat-n{font-size:2rem;font-weight:800;color:var(--orange);margin-bottom:0.25rem;letter-spacing:-0.03em}
+.stat-l{font-size:0.75rem;color:rgba(255,255,255,0.5);font-weight:600;letter-spacing:0.02em}
+
+/* ── STICKY TABS ── */
+.sticky-tabs{position:sticky;top:68px;z-index:100;background:var(--white);border-bottom:1px solid var(--border);padding:0 2.5rem;display:flex;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,0.04);overflow-x:auto}
+.tab-btn{padding:1rem 1.1rem;font-size:0.82rem;font-weight:700;color:var(--mid);border:none;background:none;cursor:pointer;border-bottom:2.5px solid transparent;transition:all 0.18s;white-space:nowrap;font-family:'Manrope',sans-serif;letter-spacing:0.01em}
+.tab-btn:hover{color:var(--ink)}
+.tab-btn.active{color:var(--orange);border-bottom-color:var(--orange)}
+
+/* ── SHARED LAYOUT ── */
+.container{max-width:1260px;margin:0 auto;padding:0 2.5rem}
+section{padding:6rem 0}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:4.5rem;align-items:start;margin-bottom:4rem}
+.divider{display:flex;align-items:center;gap:1rem;margin-bottom:1.8rem}
+.divider-line{flex:1;height:1px;background:var(--border)}
+.divider-label{font-size:0.68rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);white-space:nowrap}
+
+/* ── CALLOUT BOX ── */
+.callout-box{background:linear-gradient(135deg,var(--orange) 0%,var(--orange-dark) 100%);border-radius:var(--r);padding:2rem 2.2rem;color:#fff;margin-bottom:1.5rem;position:relative;overflow:hidden}
+.callout-box::after{content:'!';position:absolute;right:-0.5rem;top:-1.5rem;font-size:10rem;font-weight:800;color:rgba(255,255,255,0.06);line-height:1;letter-spacing:-0.05em}
+.callout-box h3{font-size:1.25rem;font-weight:800;margin-bottom:0.6rem;letter-spacing:-0.02em}
+.callout-box p{font-size:0.88rem;line-height:1.7;opacity:0.9}
+
+/* ── INCLUDES LIST ── */
+.includes-list{display:flex;flex-direction:column;gap:0.6rem}
+.inc-item{display:flex;align-items:flex-start;gap:0.85rem;padding:0.9rem 1rem;background:var(--off);border-radius:10px;font-size:0.85rem;color:var(--ink);font-weight:500;line-height:1.55}
+.inc-dot{width:22px;height:22px;min-width:22px;border-radius:50%;background:var(--orange-light);display:flex;align-items:center;justify-content:center;font-size:0.68rem;color:var(--orange);font-weight:800;flex-shrink:0;margin-top:1px}
+
+/* ── QUICK STATS GRID ── */
+.quick-stats{display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:1.2rem}
+.qs-item{background:var(--white);border-radius:10px;padding:0.9rem;text-align:center;border:1px solid var(--border)}
+.qs-n{font-size:1.35rem;font-weight:800;color:var(--orange);letter-spacing:-0.02em}
+.qs-l{font-size:0.72rem;color:var(--mid);font-weight:600;margin-top:0.15rem}
+
+/* ── PRICING TABLES ── */
+.pricing-wrap{display:flex;flex-direction:column;gap:1.5rem}
+.ptable{border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--white)}
+.ptable-head{background:var(--ink);color:var(--white);padding:1.1rem 1.6rem;display:flex;align-items:center;gap:0.8rem}
+.ptable-head h4{font-size:1rem;font-weight:800;letter-spacing:-0.01em}
+.ptable-head span{font-size:0.72rem;color:rgba(255,255,255,0.45);margin-left:auto}
+.ptable-head.alt{background:#222}
+.ptable-row{display:grid;padding:0.95rem 1.6rem;border-top:1px solid var(--border);align-items:center;transition:background 0.15s}
+.ptable-row:hover{background:var(--off)}
+.ptable-row.two{grid-template-columns:2fr 1fr}
+.ptable-row.three{grid-template-columns:2fr 1fr 1fr}
+.ptable-row.hdr{background:var(--light);font-size:0.68rem;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:var(--mid)}
+.ptable-row.hdr:hover{background:var(--light)}
+.pt-name{font-size:0.88rem;font-weight:700;color:var(--ink);letter-spacing:-0.005em}
+.pt-desc{font-size:0.74rem;color:var(--mid);margin-top:0.15rem;font-weight:500}
+.pt-price{font-size:1.1rem;font-weight:800;letter-spacing:-0.02em}
+.pt-price.orange{color:var(--orange)}
+.pt-price.grey{color:var(--mid);font-size:0.9rem;font-weight:600}
+.pt-note{font-size:0.72rem;color:var(--mid);text-align:right;font-weight:500}
+.addon-badge{display:inline-block;background:var(--orange-light);color:var(--orange);font-size:0.6rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;padding:0.15rem 0.45rem;border-radius:4px;margin-left:0.4rem;vertical-align:middle}
+.includes-note{background:var(--orange-light);border:1px solid rgba(242,101,34,0.2);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1.5rem}
+.includes-note p{font-size:0.82rem;color:var(--orange);font-weight:600;line-height:1.7}
+.includes-note strong{font-weight:800}
+
+/* ── TRAVEL BOX ── */
+.travel-box{background:var(--off);border:1px solid var(--border);border-radius:var(--r);padding:1.8rem 2rem}
+.travel-box h4{font-size:1rem;font-weight:800;margin-bottom:1.2rem;letter-spacing:-0.01em}
+.travel-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.8rem;margin-bottom:1.2rem}
+.tzone{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:0.9rem;text-align:center}
+.tzone-dist{font-size:0.7rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--mid);margin-bottom:0.3rem}
+.tzone-price{font-size:1.15rem;font-weight:800;color:var(--ink);letter-spacing:-0.02em}
+.tzone-price.free{color:var(--orange)}
+.travel-note{font-size:0.78rem;color:var(--mid);line-height:1.7;margin-bottom:1.2rem}
+.locations-bar{background:var(--orange);color:#fff;border-radius:10px;padding:1rem 1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:0.8rem}
+.locations-bar strong{font-size:0.8rem;font-weight:800;white-space:nowrap}
+.loc-chips{display:flex;gap:0.5rem;flex-wrap:wrap}
+.loc-chip{background:rgba(255,255,255,0.2);border-radius:20px;padding:0.22rem 0.75rem;font-size:0.74rem;font-weight:600}
+.contact-note{font-size:0.78rem;color:var(--mid);font-weight:500}
+
+/* ── AGENT ENQUIRY BUTTON ── */
+.agent-cta{background:var(--off);border:1.5px solid var(--border);border-radius:var(--r);padding:1.6rem 1.8rem;margin-top:1.5rem;display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap}
+.agent-cta-text h4{font-size:0.95rem;font-weight:800;margin-bottom:0.3rem;letter-spacing:-0.01em}
+.agent-cta-text p{font-size:0.82rem;color:var(--mid);line-height:1.6;font-weight:500}
+
+/* ── FLOOR PLAN PACKAGES ── */
+.pkg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-bottom:2.5rem}
+.pkg-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);padding:2rem 1.8rem;transition:transform 0.2s,box-shadow 0.2s,border-color 0.2s;position:relative}
+.pkg-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--orange)}
+.pkg-card.featured{background:var(--ink);border-color:var(--ink)}
+.pkg-card.featured:hover{box-shadow:0 20px 60px rgba(17,17,17,0.22)}
+.featured-badge{position:absolute;top:1.2rem;right:1.2rem;background:var(--orange);color:#fff;font-size:0.62rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:4px}
+.pkg-tier{font-size:0.68rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);margin-bottom:0.4rem}
+.pkg-name{font-size:1rem;font-weight:800;margin-bottom:0.4rem;color:inherit;letter-spacing:-0.015em}
+.pkg-card.featured .pkg-name{color:#fff}
+.pkg-price{font-size:2.5rem;font-weight:800;line-height:1;margin:1rem 0;color:inherit;letter-spacing:-0.04em}
+.pkg-card.featured .pkg-price{color:#fff}
+.pkg-desc{font-size:0.8rem;line-height:1.65;color:var(--mid);margin-bottom:1.2rem;font-weight:500}
+.pkg-card.featured .pkg-desc{color:rgba(255,255,255,0.58)}
+.pkg-features{list-style:none;display:flex;flex-direction:column;gap:0.55rem}
+.pkg-features li{font-size:0.8rem;color:var(--mid);display:flex;align-items:flex-start;gap:0.6rem;line-height:1.55;font-weight:500}
+.pkg-card.featured .pkg-features li{color:rgba(255,255,255,0.65)}
+.pkg-features li::before{content:'✓';color:var(--orange);font-weight:800;flex-shrink:0}
+
+/* ── ADD-ONS ── */
+.addons-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.8rem;margin-bottom:2.5rem}
+.addon-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:1.2rem;text-align:center;transition:transform 0.18s,border-color 0.18s}
+.addon-card:hover{transform:translateY(-2px);border-color:var(--orange)}
+.addon-icon{font-size:1.5rem;margin-bottom:0.5rem}
+.addon-name{font-size:0.78rem;font-weight:700;color:var(--ink);margin-bottom:0.3rem;letter-spacing:-0.005em}
+.addon-price{font-size:1.05rem;font-weight:800;color:var(--orange);letter-spacing:-0.02em}
+.addon-note{font-size:0.68rem;color:var(--mid);margin-top:0.2rem;font-weight:500}
+
+/* ── MONTHLY PACKAGES ── */
+.monthly-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.monthly-card{border:1.5px solid var(--border);border-radius:var(--r);padding:1.8rem 1.6rem;position:relative;transition:all 0.2s;background:var(--white)}
+.monthly-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:var(--orange)}
+.monthly-card.featured{border-color:var(--orange);box-shadow:0 0 0 4px rgba(242,101,34,0.1),var(--shadow)}
+.monthly-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--orange);color:#fff;font-size:0.66rem;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;padding:0.3rem 1rem;border-radius:20px;white-space:nowrap}
+.monthly-tier{font-size:0.68rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);margin-bottom:0.4rem}
+.monthly-name{font-size:1.05rem;font-weight:800;color:var(--ink);margin-bottom:0.8rem;letter-spacing:-0.015em}
+.monthly-price{font-size:2.2rem;font-weight:800;color:var(--ink);line-height:1;margin-bottom:0.3rem;letter-spacing:-0.04em}
+.monthly-price small{font-size:0.9rem;font-weight:600;color:var(--mid)}
+.per-plan{display:inline-block;background:var(--orange-light);color:var(--orange);font-size:0.76rem;font-weight:700;padding:0.28rem 0.75rem;border-radius:20px;margin-bottom:1.1rem;letter-spacing:0.01em}
+.monthly-features{list-style:none;display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.3rem}
+.monthly-features li{font-size:0.8rem;color:var(--mid);display:flex;gap:0.55rem;align-items:flex-start;font-weight:500}
+.monthly-features li::before{content:'✓';color:var(--orange);font-weight:800}
+.custom-cta-box{background:var(--off);border:1.5px dashed var(--border);border-radius:var(--r);padding:1.8rem;text-align:center;margin-top:1.5rem}
+.custom-cta-box p{font-size:0.88rem;color:var(--mid);margin-bottom:1rem;font-weight:500}
+
+/* ── HOW IT WORKS ── */
+.how-section{background:var(--light)}
+.steps-row{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
+.steps-row::before{content:'';position:absolute;top:2.4rem;left:calc(12.5% + 1.5rem);right:calc(12.5% + 1.5rem);height:2px;background:linear-gradient(90deg,var(--orange),var(--orange-mid));z-index:0}
+.step-card{padding:1.5rem;text-align:center;position:relative;z-index:1}
+.step-num{width:48px;height:48px;border-radius:50%;background:var(--orange);color:#fff;font-size:1.1rem;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 1.2rem;box-shadow:0 4px 16px rgba(242,101,34,0.35);position:relative;z-index:2}
+.step-title{font-size:0.95rem;font-weight:800;margin-bottom:0.4rem;letter-spacing:-0.01em}
+.step-desc{font-size:0.81rem;color:var(--mid);line-height:1.65;font-weight:500}
+
+/* ── CUSTOM DRAWINGS ── */
+.custom-section{background:var(--white)}
+.custom-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-bottom:2rem}
+.custom-card{background:var(--off);border:1px solid var(--border);border-radius:var(--r);padding:2rem 1.8rem;transition:all 0.2s}
+.custom-card:hover{border-color:var(--orange);background:var(--white);box-shadow:var(--shadow)}
+.custom-icon{font-size:2rem;margin-bottom:1rem}
+.custom-card h4{font-size:0.95rem;font-weight:800;margin-bottom:0.5rem;letter-spacing:-0.01em}
+.custom-card p{font-size:0.82rem;color:var(--mid);line-height:1.7;font-weight:500}
+
+/* ── FAQ ── */
+.faq-section{background:var(--off)}
+.faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.faq-item{padding:1.8rem 2rem;border-bottom:1px solid var(--border)}
+.faq-item:nth-child(odd){border-right:1px solid var(--border)}
+.faq-item h4{font-size:0.9rem;font-weight:700;margin-bottom:0.5rem;letter-spacing:-0.01em}
+.faq-item p{font-size:0.83rem;color:var(--mid);line-height:1.72;font-weight:500}
+
+/* ── CTA ── */
+.cta-section{background:var(--orange);padding:5rem 0;text-align:center;position:relative;overflow:hidden}
+.cta-section::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,0.08) 1px,transparent 1px);background-size:26px 26px}
+.cta-section h2{color:#fff;margin-bottom:0.5rem}
+.cta-section p{color:rgba(255,255,255,0.82);font-size:1rem;margin-bottom:2rem;font-weight:500}
+.cta-contact{display:flex;justify-content:center;gap:3rem;flex-wrap:wrap;margin-top:2rem}
+.cta-contact a{color:rgba(255,255,255,0.85);text-decoration:none;font-size:0.88rem;font-weight:600;display:flex;align-items:center;gap:0.4rem;transition:color 0.18s}
+.cta-contact a:hover{color:#fff}
+
+/* ── FOOTER ── */
+footer{background:var(--dark);color:rgba(255,255,255,0.42);padding:2.5rem 2.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+footer .logo{color:var(--orange)}
+.foot-links{display:flex;gap:1.5rem;flex-wrap:wrap}
+.foot-links a{font-size:0.78rem;color:rgba(255,255,255,0.38);text-decoration:none;transition:color 0.18s;font-weight:600}
+.foot-links a:hover{color:#fff}
+footer .logo .logo-snap{color:var(--orange)}
+footer .logo .logo-plan{color:rgba(255,255,255,0.7)}
+footer p{font-size:0.75rem;font-weight:500}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.25s;backdrop-filter:blur(4px)}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:#fff;border-radius:16px;padding:2.5rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;transform:translateY(20px);transition:transform 0.25s;box-shadow:0 32px 80px rgba(0,0,0,0.2)}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal h3{font-size:1.3rem;font-weight:800;margin-bottom:0.4rem;letter-spacing:-0.02em}
+.modal p.modal-sub{font-size:0.85rem;color:var(--mid);margin-bottom:1.5rem;font-weight:500}
+.modal-close{position:absolute;top:1.2rem;right:1.2rem;background:var(--light);border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:background 0.18s}
+.modal-close:hover{background:var(--border)}
+.modal{position:relative}
+.form-group{margin-bottom:1.1rem}
+.form-group label{display:block;font-size:0.78rem;font-weight:700;color:var(--ink);margin-bottom:0.4rem;letter-spacing:0.01em}
+.form-group input,.form-group textarea,.form-group select{width:100%;padding:0.75rem 1rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;color:var(--ink);background:var(--white);transition:border-color 0.18s;outline:none}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(242,101,34,0.1)}
+.form-group textarea{resize:vertical;min-height:100px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem}
+.form-note{font-size:0.75rem;color:var(--mid);margin-bottom:1rem;font-weight:500}
+
+/* ── ANIMATIONS ── */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity 0.65s ease,transform 0.65s ease}
+.reveal.in{opacity:1;transform:translateY(0)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1024px){
+  .hero-inner{grid-template-columns:1fr;gap:2.5rem}
+  .hero-bg,.hero-dots{display:none}
+  .hero-right{align-items:flex-start}
+  .service-pill{width:100%;max-width:380px}
+  .service-pill:nth-child(2){margin-left:0}
+  .two-col{grid-template-columns:1fr}
+  .pkg-grid{grid-template-columns:1fr 1fr}
+  .addons-grid{grid-template-columns:1fr 1fr}
+  .monthly-grid{grid-template-columns:1fr 1fr}
+  .steps-row::before{display:none}
+  .steps-row{grid-template-columns:1fr 1fr}
+  .stats-inner{grid-template-columns:1fr 1fr}
+  .stat-item:nth-child(2){border-right:none}
+  .stat-item:nth-child(3){border-right:1px solid rgba(255,255,255,0.08)}
+  .custom-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:768px){
+  nav{padding:0 1.2rem}
+  .nav-links{display:none}
+  .container{padding:0 1.2rem}
+  section{padding:4rem 0}
+  .sticky-tabs{padding:0 1.2rem}
+  .pkg-grid{grid-template-columns:1fr}
+  .monthly-grid{grid-template-columns:1fr}
+  .addons-grid{grid-template-columns:1fr 1fr}
+  .travel-grid{grid-template-columns:1fr 1fr}
+  .faq-grid{grid-template-columns:1fr}
+  .faq-item:nth-child(odd){border-right:none}
+  .cta-contact{gap:1.5rem}
+  footer{flex-direction:column;align-items:flex-start;padding:2rem 1.2rem}
+  .ptable-row.three{grid-template-columns:2fr 1fr}
+  .ptable-row.three .pt-note{display:none}
+  .stats-inner{padding:0 1.2rem;grid-template-columns:1fr 1fr}
+  .custom-grid{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .steps-row{grid-template-columns:1fr}
+  h1{font-size:2.6rem}
+  h2{font-size:2rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav>
+  <a href="#" class="logo-wrap" style="text-decoration:none;display:inline-flex;align-items:center;gap:0;line-height:1">
+    <span style="font-family:'Manrope',sans-serif;font-weight:800;font-size:1.55rem;letter-spacing:-0.03em;color:#fff">Snap</span><span style="font-family:'Manrope',sans-serif;font-weight:800;font-size:1.55rem;letter-spacing:-0.03em;color:rgba(255,255,255,0.72)">Pla</span><svg viewBox="0 0 28 30" height="24" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;margin-bottom:2px;margin-left:0px"><polygon points="14,1 27,13 1,13" fill="rgba(255,255,255,0.72)"/><rect x="2" y="13" width="24" height="16" fill="rgba(255,255,255,0.72)"/><rect x="9" y="19" width="10" height="10" fill="#f26522"/></svg>
+  </a>
+  <div class="nav-links">
+
+    <!-- Services dropdown -->
+    <div class="nav-dropdown">
+      <a href="#">Services</a>
+      <div class="dropdown-menu">
+        <a href="#surveys"><span class="dm-icon">📐</span>Measured Surveys</a>
+        <a href="#floorplans"><span class="dm-icon">🏠</span>Coloured Floor Plans</a>
+        <a href="#monthly"><span class="dm-icon">📦</span>Agency Packages</a>
+        <a href="#custom"><span class="dm-icon">✏️</span>Custom Drawings</a>
+      </div>
+    </div>
+
+    <!-- Landlord? dropdown -->
+    <div class="nav-dropdown">
+      <a href="#">Landlord?</a>
+      <div class="dropdown-menu">
+        <a href="#surveys"><span class="dm-icon">🏘️</span>Measured Surveys for Licensing</a>
+        <a href="#surveys"><span class="dm-icon">📋</span>HMO Applications</a>
+        <a href="#floorplans"><span class="dm-icon">🏠</span>Listing Floor Plans</a>
+        <div class="dropdown-divider"></div>
+        <a href="#contact"><span class="dm-icon">💬</span>Talk to Us</a>
+      </div>
+    </div>
+
+    <!-- Letting Agent? dropdown -->
+    <div class="nav-dropdown">
+      <a href="#">Letting Agent?</a>
+      <div class="dropdown-menu">
+        <a href="#floorplans"><span class="dm-icon">🏠</span>Coloured Floor Plans</a>
+        <a href="#monthly"><span class="dm-icon">📦</span>Monthly Agency Packages</a>
+        <a href="#surveys"><span class="dm-icon">📐</span>Measured Surveys</a>
+        <div class="dropdown-divider"></div>
+        <a href="#contact"><span class="dm-icon">💬</span>Get a Package Quote</a>
+      </div>
+    </div>
+
+    <a href="#custom">Custom Drawings</a>
+
+    <a href="#contact" class="nav-contact-btn">Contact Us</a>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-dots"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-tag">📍 Serving Newcastle, Gateshead & The North East</div>
+      <h1>Professional<br/>Plans. <span class="accent">Fast.<br/>Local.</span> Done.</h1>
+      <p class="hero-sub">From council licensing-ready measured surveys to Rightmove-ready coloured floor plans — we help landlords, letting agents, and HMO managers move faster and list smarter.</p>
+      <div class="hero-btns">
+        <a href="#surveys" class="btn-primary">📐 Measured Surveys</a>
+        <a href="#floorplans" class="btn-outline">🏠 Floor Plans</a>
+      </div>
+      <div class="hero-stats">
+        <div><div class="hstat-n">48hr</div><div class="hstat-l">Standard Turnaround</div></div>
+        <div><div class="hstat-n">£50</div><div class="hstat-l">Surveys From</div></div>
+        <div><div class="hstat-n">£9.99</div><div class="hstat-l">Plans From</div></div>
+        <div><div class="hstat-n">Free</div><div class="hstat-l">First Revision</div></div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <a href="#surveys" class="service-pill">
+        <div class="sp-icon">📐</div>
+        <div>
+          <div class="sp-label">Measured Surveys</div>
+          <div class="sp-title">For Property Licensing</div>
+          <div class="sp-sub">HMO & council applications</div>
+        </div>
+        <span class="sp-arrow">→</span>
+      </a>
+      <a href="#floorplans" class="service-pill">
+        <div class="sp-icon">🏠</div>
+        <div>
+          <div class="sp-label">Coloured Floor Plans</div>
+          <div class="sp-title">Marketing & Listings</div>
+          <div class="sp-sub">Rightmove & portal-ready plans</div>
+        </div>
+        <span class="sp-arrow">→</span>
+      </a>
+      <a href="#custom" class="service-pill">
+        <div class="sp-icon">✏️</div>
+        <div>
+          <div class="sp-label">Custom Drawings</div>
+          <div class="sp-title">Bespoke & One-Off Requests</div>
+          <div class="sp-sub">Something different? We can help</div>
+        </div>
+        <span class="sp-arrow">→</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ══ STATS BAR ══ -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item"><div class="stat-n">48hr</div><div class="stat-l">Standard delivery after site visit</div></div>
+    <div class="stat-item"><div class="stat-n">£50</div><div class="stat-l">Survey plans from</div></div>
+    <div class="stat-item"><div class="stat-n">£9.99</div><div class="stat-l">Coloured plans from</div></div>
+    <div class="stat-item"><div class="stat-n">100%</div><div class="stat-l">First revision free</div></div>
+  </div>
+</div>
+
+<!-- ══ STICKY TABS ══ -->
+<div class="sticky-tabs">
+  <button class="tab-btn active" onclick="jumpTo('#surveys')">📐 Measured Surveys</button>
+  <button class="tab-btn" onclick="jumpTo('#floorplans')">🏠 Floor Plans</button>
+  <button class="tab-btn" onclick="jumpTo('#monthly')">📦 Agency Packages</button>
+  <button class="tab-btn" onclick="jumpTo('#custom')">✏️ Custom Drawings</button>
+  <button class="tab-btn" onclick="jumpTo('#how')">⚡ How It Works</button>
+  <button class="tab-btn" onclick="jumpTo('#contact')">✉️ Contact</button>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MEASURED SURVEYS FOR PROPERTY LICENSING
+═══════════════════════════════════════════ -->
+<section id="surveys" style="background:var(--white)">
+  <div class="container">
+    <div class="two-col">
+      <div class="reveal">
+        <div class="sec-tag">Measured Surveys for Property Licensing</div>
+        <h2>Are You a <span class="accent">Landlord</span><br/>or Letting Agent?</h2>
+        <p class="sec-sub" style="margin-bottom:1.5rem">If you need to license a property with the council — whether for an HMO, selective licensing, or mandatory licensing — you need accurate, professionally drawn floor plans. We make the whole process fast and straightforward.</p>
+        <p style="font-size:0.88rem;color:var(--mid);line-height:1.8;margin-bottom:1.2rem">Council licensing applications require floor plans showing room dimensions, usage, and fire safety information. Delays in getting these drawings can push back your licence — keeping your property off the rental market longer than necessary.</p>
+        <p style="font-size:0.88rem;color:var(--mid);line-height:1.8;margin-bottom:2rem"><strong style="color:var(--ink)">Snap Plan provides a fast, local, and flexible measured survey service</strong> across Newcastle, Gateshead, Sunderland, Durham, North Tyneside, and South Tyneside. We visit your property, take accurate measurements, and deliver council-ready drawings — typically within 48 hours of the site visit.</p>
+        <div class="includes-list">
+          <div class="inc-item"><div class="inc-dot">✓</div><div><strong>On-site measurement</strong> — we visit and measure every room accurately</div></div>
+          <div class="inc-item"><div class="inc-dot">✓</div><div><strong>Room dimensions in m² and ft²</strong> — clearly labelled throughout</div></div>
+          <div class="inc-item"><div class="inc-dot">✓</div><div><strong>48-hour turnaround</strong> — from after the site visit, subject to property size</div></div>
+          <div class="inc-item"><div class="inc-dot">✓</div><div><strong>One free revision included</strong> — additional revisions are just £5 each</div></div>
+          <div class="inc-item"><div class="inc-dot">✓</div><div><strong>Council and licensing ready</strong> — formatted to meet local authority standards</div></div>
+          <div class="inc-item"><div class="inc-dot">✓</div><div><strong>Get licensed faster</strong> — quicker drawings mean quicker applications and rental income sooner</div></div>
+        </div>
+      </div>
+      <div class="reveal">
+        <div class="callout-box">
+          <h3>Got a licensing deadline?</h3>
+          <p>We work around your schedule — evenings and weekends available. Message us via email or WhatsApp and we'll get you booked in quickly. Same-day turnaround is available as an add-on.</p>
+        </div>
+        <div style="background:var(--off);border-radius:var(--r);padding:1.5rem;margin-bottom:1.2rem">
+          <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:var(--mid);margin-bottom:0.8rem">Why choose Snap Plan</div>
+          <div class="quick-stats">
+            <div class="qs-item"><div class="qs-n">48hr</div><div class="qs-l">Typical Turnaround</div></div>
+            <div class="qs-item"><div class="qs-n">Local</div><div class="qs-l">NE-Based Team</div></div>
+            <div class="qs-item"><div class="qs-n">£50</div><div class="qs-l">Starting Price</div></div>
+            <div class="qs-item"><div class="qs-n">Free</div><div class="qs-l">First Revision</div></div>
+          </div>
+        </div>
+        <a href="#contact" class="btn-primary" style="width:100%;justify-content:center">Book a Survey →</a>
+      </div>
+    </div>
+
+    <!-- What's included note -->
+    <div class="includes-note reveal">
+      <p><strong>All survey plans include:</strong> 48-hour turnaround (from after the site visit) · On-site measurement · Room dimensions · m² / ft² · One free revision</p>
+    </div>
+
+    <!-- Pricing Tables -->
+    <div class="pricing-wrap reveal">
+      <div class="ptable">
+        <div class="ptable-head">
+          <span>🏘️</span>
+          <h4>Residential Survey Pricing</h4>
+          <span>Contact us for HMO quotes</span>
+        </div>
+        <div class="ptable-row three hdr"><span>Property Type</span><span>Price</span><span>Notes</span></div>
+        <div class="ptable-row three">
+          <div><div class="pt-name">Studios & Flats (All Bedroom Sizes)</div></div>
+          <div class="pt-price orange">£50</div>
+          <div class="pt-note">Great for HMO rooms</div>
+        </div>
+        <div class="ptable-row three">
+          <div><div class="pt-name">2 Bed Property</div></div>
+          <div class="pt-price orange">£99</div>
+          <div class="pt-note">Selective licensing</div>
+        </div>
+        <div class="ptable-row three">
+          <div><div class="pt-name">3 Bed Property</div></div>
+          <div class="pt-price orange">£110</div>
+          <div class="pt-note">Mandatory HMO threshold</div>
+        </div>
+        <div class="ptable-row three">
+          <div><div class="pt-name">HMO or 4 Bed +</div><div class="pt-desc">Multi-occupancy, complex, or multi-storey — contact us for a tailored quote</div></div>
+          <div class="pt-price orange">£150–£300+</div>
+          <div class="pt-note">Quote on enquiry</div>
+        </div>
+      </div>
+
+      <div class="ptable">
+        <div class="ptable-head alt">
+          <span>➕</span>
+          <h4>HMO & Licensing Add-Ons</h4>
+          <span>Add to any survey order</span>
+        </div>
+        <div class="ptable-row two hdr"><span>Add-On</span><span>Price</span></div>
+        <div class="ptable-row two">
+          <div><div class="pt-name">Emergency Lighting Layout <span class="addon-badge">HMO</span></div><div class="pt-desc">Positions marked for compliance documentation</div></div>
+          <div class="pt-price orange">+£10</div>
+        </div>
+        <div class="ptable-row two">
+          <div><div class="pt-name">Fire, Alarm, Exit & Door Marking <span class="addon-badge">Safety</span></div><div class="pt-desc">All fire safety elements marked on plan</div></div>
+          <div class="pt-price orange">+£10</div>
+        </div>
+        <div class="ptable-row two">
+          <div><div class="pt-name">Escape Route Marking <span class="addon-badge">Safety</span></div><div class="pt-desc">Clearly defined escape routes shown on drawing</div></div>
+          <div class="pt-price orange">+£5</div>
+        </div>
+        <div class="ptable-row two">
+          <div><div class="pt-name">Same-Day Turnaround <span class="addon-badge">Rush</span></div><div class="pt-desc">Priority processing — delivered the same day as the site visit</div></div>
+          <div class="pt-price orange">+£20</div>
+        </div>
+        <div class="ptable-row two">
+          <div><div class="pt-name">Additional Revisions</div><div class="pt-desc">After your included free first revision</div></div>
+          <div class="pt-price grey">£5 each</div>
+        </div>
+      </div>
+
+      <!-- Travel -->
+      <div class="travel-box reveal">
+        <h4>📍 Travel Charges & Area Coverage</h4>
+        <div class="travel-grid">
+          <div class="tzone"><div class="tzone-dist">0–5 miles</div><div class="tzone-price free">Included</div></div>
+          <div class="tzone"><div class="tzone-dist">5–10 miles</div><div class="tzone-price">+£10</div></div>
+          <div class="tzone"><div class="tzone-dist">10–20 miles</div><div class="tzone-price">+£20</div></div>
+          <div class="tzone"><div class="tzone-dist">20–30 miles</div><div class="tzone-price">+£35</div></div>
+        </div>
+        <p class="travel-note">Travel charges apply outside our standard service area from Newcastle city centre. Long-distance and multi-property visits are quoted individually — we're always happy to discuss options.</p>
+        <div class="locations-bar">
+          <strong>📍 Core Areas Covered:</strong>
+          <div class="loc-chips">
+            <span class="loc-chip">Newcastle</span>
+            <span class="loc-chip">Gateshead</span>
+            <span class="loc-chip">Sunderland</span>
+            <span class="loc-chip">Durham</span>
+            <span class="loc-chip">North Tyneside</span>
+            <span class="loc-chip">South Tyneside</span>
+            <span class="loc-chip">+ Other areas available</span>
+          </div>
+        </div>
+        <p class="contact-note" style="margin-top:0.8rem">📧 Email or WhatsApp us to book. Outside these areas? Just get in touch — we can usually help.</p>
+      </div>
+
+      <!-- Agent enquiry CTA -->
+      <div class="agent-cta reveal">
+        <div class="agent-cta-text" style="flex:1">
+          <h4>Are you a letting agent or landlord with multiple properties?</h4>
+          <p>Drop us a message and we'll help you get started with a package that works for your portfolio.</p>
+        </div>
+        <button class="btn-primary" onclick="openModal('agent')">Get in Touch →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     COLOURED MARKETING FLOOR PLANS
+═══════════════════════════════════════════ -->
+<section id="floorplans" style="background:var(--off)">
+  <div class="container">
+    <div class="two-col">
+      <div class="reveal">
+        <div class="sec-tag">Coloured Marketing Floor Plans</div>
+        <h2>Make Your<br/><span class="accent">Listings</span> Stand Out</h2>
+        <p class="sec-sub" style="margin-bottom:1.5rem">Properties with professional floor plans attract significantly more enquiries, generate more viewings, and let faster. Our coloured, branded plans are built specifically for Rightmove, Zoopla, and OnTheMarket.</p>
+        <p style="font-size:0.88rem;color:var(--mid);line-height:1.8;margin-bottom:2rem">Whether you're a letting agent, estate agent, or independent landlord — a polished floor plan signals quality before a single viewing is booked. No site visit is required from you. Simply send your measurements or photos and we'll take care of the rest.</p>
+        <div class="includes-list">
+          <div class="inc-item"><div class="inc-dot">✓</div><div>2D coloured floor plan with room labels and dimensions</div></div>
+          <div class="inc-item"><div class="inc-dot">✓</div><div>Room sizes in m² and ft² — portal standard format</div></div>
+          <div class="inc-item"><div class="inc-dot">✓</div><div>Compass included to show buyers and tenants which way is north</div></div>
+          <div class="inc-item"><div class="inc-dot">✓</div><div>Rightmove-ready JPG + PDF delivered to your inbox</div></div>
+          <div class="inc-item"><div class="inc-dot">✓</div><div>One free revision included on every plan</div></div>
+          <div class="inc-item"><div class="inc-dot">✓</div><div>No site visit required — send measurements, sketches, or photos</div></div>
+        </div>
+      </div>
+      <div class="reveal">
+        <!-- Sample floor plan SVG -->
+        <div style="background:var(--white);border-radius:var(--r);padding:2rem;box-shadow:var(--shadow-lg);border:1px solid var(--border)">
+          <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:1rem;display:flex;justify-content:space-between">
+            <span>Sample — 3 Bed Semi-Detached</span><span style="color:var(--orange)">✓ Portal Ready</span>
+          </div>
+          <svg viewBox="0 0 400 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block" font-family="Manrope, sans-serif">
+            <rect width="400" height="280" fill="#f9f8f6"/>
+            <defs><pattern id="g2" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M16 0L0 0 0 16" fill="none" stroke="#ede9e2" stroke-width="0.5"/></pattern></defs>
+            <rect width="400" height="280" fill="url(#g2)"/>
+            <rect x="20" y="20" width="360" height="240" fill="none" stroke="#1a1a1a" stroke-width="5" rx="1"/>
+            <line x1="200" y1="20" x2="200" y2="160" stroke="#1a1a1a" stroke-width="3.5"/>
+            <line x1="20" y1="160" x2="280" y2="160" stroke="#1a1a1a" stroke-width="3.5"/>
+            <line x1="280" y1="160" x2="280" y2="260" stroke="#1a1a1a" stroke-width="3.5"/>
+            <line x1="200" y1="100" x2="380" y2="100" stroke="#1a1a1a" stroke-width="3.5"/>
+            <rect x="22" y="22" width="175" height="135" fill="rgba(242,101,34,0.07)" rx="1"/>
+            <rect x="202" y="22" width="175" height="75" fill="rgba(100,149,237,0.07)" rx="1"/>
+            <rect x="202" y="102" width="175" height="55" fill="rgba(100,200,120,0.07)" rx="1"/>
+            <rect x="22" y="162" width="255" height="95" fill="rgba(242,101,34,0.05)" rx="1"/>
+            <rect x="282" y="162" width="95" height="95" fill="rgba(100,149,237,0.07)" rx="1"/>
+            <path d="M200 130 Q175 130 175 105" fill="none" stroke="#f26522" stroke-width="1.5" stroke-dasharray="3,2"/>
+            <line x1="200" y1="130" x2="200" y2="105" stroke="#f26522" stroke-width="1.5"/>
+            <path d="M240 160 Q240 180 260 180" fill="none" stroke="#f26522" stroke-width="1.5" stroke-dasharray="3,2"/>
+            <line x1="240" y1="160" x2="260" y2="160" stroke="#f26522" stroke-width="1.5"/>
+            <line x1="60" y1="20" x2="110" y2="20" stroke="#6495ed" stroke-width="3"/>
+            <line x1="280" y1="20" x2="340" y2="20" stroke="#6495ed" stroke-width="3"/>
+            <line x1="20" y1="60" x2="20" y2="110" stroke="#6495ed" stroke-width="3"/>
+            <line x1="380" y1="200" x2="380" y2="245" stroke="#6495ed" stroke-width="3"/>
+            <rect x="35" y="105" width="80" height="35" rx="3" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
+            <rect x="40" y="100" width="70" height="10" rx="2" fill="none" stroke="#1a1a1a" stroke-width="1"/>
+            <rect x="60" y="40" width="50" height="38" rx="2" fill="none" stroke="#1a1a1a" stroke-width="1.2"/>
+            <circle cx="72" cy="52" r="4" fill="none" stroke="#1a1a1a" stroke-width="1"/>
+            <circle cx="72" cy="68" r="4" fill="none" stroke="#1a1a1a" stroke-width="1"/>
+            <circle cx="100" cy="52" r="4" fill="none" stroke="#1a1a1a" stroke-width="1"/>
+            <circle cx="100" cy="68" r="4" fill="none" stroke="#1a1a1a" stroke-width="1"/>
+            <rect x="214" y="30" width="50" height="45" rx="3" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
+            <rect x="214" y="30" width="50" height="12" rx="2" fill="none" stroke="#1a1a1a" stroke-width="1"/>
+            <line x1="239" y1="42" x2="239" y2="75" stroke="#1a1a1a" stroke-width="0.8"/>
+            <rect x="35" y="172" width="100" height="18" rx="2" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
+            <circle cx="68" cy="181" r="6" fill="none" stroke="#1a1a1a" stroke-width="1"/>
+            <circle cx="88" cy="181" r="6" fill="none" stroke="#1a1a1a" stroke-width="1"/>
+            <rect x="296" y="170" width="50" height="35" rx="4" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
+            <rect x="300" y="238" width="28" height="18" rx="2" fill="none" stroke="#1a1a1a" stroke-width="1.2"/>
+            <text x="107" y="90" text-anchor="middle" font-size="8.5" fill="#6b6b6b" font-weight="700">LIVING ROOM</text>
+            <text x="107" y="101" text-anchor="middle" font-size="7" fill="#f26522">4.6m × 4.1m</text>
+            <text x="292" y="65" text-anchor="middle" font-size="8.5" fill="#6b6b6b" font-weight="700">BEDROOM 1</text>
+            <text x="292" y="76" text-anchor="middle" font-size="7" fill="#f26522">4.0m × 2.8m</text>
+            <text x="292" y="133" text-anchor="middle" font-size="8.5" fill="#6b6b6b" font-weight="700">BEDROOM 2</text>
+            <text x="292" y="144" text-anchor="middle" font-size="7" fill="#f26522">3.8m × 2.4m</text>
+            <text x="142" y="215" text-anchor="middle" font-size="8.5" fill="#6b6b6b" font-weight="700">KITCHEN / DINING</text>
+            <text x="142" y="226" text-anchor="middle" font-size="7" fill="#f26522">5.2m × 3.5m</text>
+            <text x="328" y="215" text-anchor="middle" font-size="8.5" fill="#6b6b6b" font-weight="700">BATHROOM</text>
+            <text x="328" y="226" text-anchor="middle" font-size="7" fill="#f26522">2.4m × 2.2m</text>
+            <circle cx="372" cy="270" r="9" fill="none" stroke="#f26522" stroke-width="1"/>
+            <text x="372" y="274" text-anchor="middle" font-size="8" fill="#f26522" font-weight="700">N</text>
+            <line x1="22" y1="274" x2="70" y2="274" stroke="#1a1a1a" stroke-width="1.5"/>
+            <line x1="22" y1="270" x2="22" y2="278" stroke="#1a1a1a" stroke-width="1.5"/>
+            <line x1="70" y1="270" x2="70" y2="278" stroke="#1a1a1a" stroke-width="1.5"/>
+            <text x="46" y="270" text-anchor="middle" font-size="6.5" fill="#6b6b6b">3m</text>
+          </svg>
+          <div style="display:flex;gap:0;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+            <div style="flex:1;text-align:center"><div style="font-size:1rem;font-weight:800;letter-spacing:-0.02em">3 Bed</div><div style="font-size:0.68rem;color:var(--mid);font-weight:600">Property</div></div>
+            <div style="flex:1;text-align:center"><div style="font-size:1rem;font-weight:800;letter-spacing:-0.02em">78m²</div><div style="font-size:0.68rem;color:var(--mid);font-weight:600">Total Area</div></div>
+            <div style="flex:1;text-align:center"><div style="font-size:1rem;font-weight:800;color:var(--orange);letter-spacing:-0.02em">£25</div><div style="font-size:0.68rem;color:var(--mid);font-weight:600">This Plan</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plan packages -->
+    <div class="divider reveal"><div class="divider-line"></div><div class="divider-label">Floor Plan Packages</div><div class="divider-line"></div></div>
+    <div class="pkg-grid reveal">
+      <div class="pkg-card">
+        <div class="pkg-tier">Essential</div>
+        <div class="pkg-name">Up to 2 Bed</div>
+        <div class="pkg-price">£9.99</div>
+        <div class="pkg-desc">Ideal for studios, flats, and smaller properties. Everything needed for a professional portal listing.</div>
+        <ul class="pkg-features">
+          <li>2D coloured floor plan</li>
+          <li>Room labels and dimensions</li>
+          <li>m² and ft² displayed</li>
+          <li>Compass (north indicator)</li>
+          <li>Branded design</li>
+          <li>Rightmove-ready JPG + PDF</li>
+          <li>One free revision</li>
+        </ul>
+      </div>
+      <div class="pkg-card featured">
+        <div class="featured-badge">Most Popular</div>
+        <div class="pkg-tier">Family Property</div>
+        <div class="pkg-name">3–4 Bed Plan</div>
+        <div class="pkg-price">£25</div>
+        <div class="pkg-desc">The most requested plan type. Covers the majority of the residential lettings and sales market.</div>
+        <ul class="pkg-features">
+          <li>Everything in Essential</li>
+          <li>Up to 4 bedrooms</li>
+          <li>All room types labelled</li>
+          <li>Ground and first floor included</li>
+          <li>Rightmove, Zoopla & OTM ready</li>
+          <li>One free revision</li>
+        </ul>
+      </div>
+      <div class="pkg-card">
+        <div class="pkg-tier">Large / Complex</div>
+        <div class="pkg-name">4–5 Bed +</div>
+        <div class="pkg-price">From £45</div>
+        <div class="pkg-desc">For large, extended, or unusual properties. Complex geometry, annexes, and split-levels all handled.</div>
+        <ul class="pkg-features">
+          <li>Everything in Family Plan</li>
+          <li>Extensions and annexes</li>
+          <li>Split-levels and loft rooms</li>
+          <li>Complex geometry handled</li>
+          <li>Multi-floor plans</li>
+          <li>One free revision</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Add-ons -->
+    <div class="divider reveal"><div class="divider-line"></div><div class="divider-label">Plan Add-Ons</div><div class="divider-line"></div></div>
+    <div class="addons-grid reveal">
+      <div class="addon-card"><div class="addon-icon">⚡</div><div class="addon-name">Same Day</div><div class="addon-price">+£15</div><div class="addon-note">Delivered same day</div></div>
+      <div class="addon-card"><div class="addon-icon">⏱️</div><div class="addon-name">Under 4 Hours</div><div class="addon-price">+£20</div><div class="addon-note">Express rush service</div></div>
+      <div class="addon-card"><div class="addon-icon">🎨</div><div class="addon-name">Agency Branding</div><div class="addon-price">+£4</div><div class="addon-note">Match your logo & colours</div></div>
+      <div class="addon-card"><div class="addon-icon">🏗️</div><div class="addon-name">3D Style Plan</div><div class="addon-price">+£15</div><div class="addon-note">Isometric 3D view</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     MONTHLY AGENCY PACKAGES
+═══════════════════════════════════════════ -->
+<section id="monthly" style="background:var(--white)">
+  <div class="container">
+    <div class="reveal" style="text-align:center;margin-bottom:3rem">
+      <div class="sec-tag" style="justify-content:center;margin:0 auto 0.9rem">Monthly Packages</div>
+      <h2 style="text-align:center">Save More, <span class="accent">List More</span></h2>
+      <p class="sec-sub" style="text-align:center;margin:0.5rem auto;max-width:520px">If you're listing regularly, a monthly package saves money on every single plan. Perfect for letting agents, estate agents, and property managers with consistent stock.</p>
+    </div>
+    <div class="monthly-grid reveal">
+      <div class="monthly-card">
+        <div class="monthly-tier">Beginner</div>
+        <div class="monthly-name">Beginner Package</div>
+        <div class="monthly-price">£29 <small>/mo</small></div>
+        <div class="per-plan">£9.66 per plan</div>
+        <ul class="monthly-features">
+          <li>3 floor plans per month</li>
+          <li>Any property type</li>
+          <li>48-hour standard turnaround</li>
+          <li>One free revision per plan</li>
+        </ul>
+        <a href="#contact" class="btn-outline" style="width:100%;justify-content:center;font-size:0.83rem">Get Started</a>
+      </div>
+      <div class="monthly-card featured">
+        <div class="monthly-badge">⭐ Best Value</div>
+        <div class="monthly-tier">Starter Agency</div>
+        <div class="monthly-name">Starter Agency</div>
+        <div class="monthly-price">£65 <small>/mo</small></div>
+        <div class="per-plan">£8.12 per plan</div>
+        <ul class="monthly-features">
+          <li>8 floor plans per month</li>
+          <li>Any property type</li>
+          <li>Mix and match plan sizes</li>
+          <li>48-hour standard turnaround</li>
+          <li>One free revision per plan</li>
+          <li>Dedicated account contact</li>
+        </ul>
+        <a href="#contact" class="btn-primary" style="width:100%;justify-content:center;font-size:0.83rem">Get Started</a>
+      </div>
+      <div class="monthly-card">
+        <div class="monthly-tier">Growth</div>
+        <div class="monthly-name">Growth Agency</div>
+        <div class="monthly-price">£110 <small>/mo</small></div>
+        <div class="per-plan">£11 per plan</div>
+        <ul class="monthly-features">
+          <li>10 floor plans per month</li>
+          <li>Any property type</li>
+          <li>Priority turnaround</li>
+          <li>One free revision per plan</li>
+          <li>Dedicated account contact</li>
+        </ul>
+        <a href="#contact" class="btn-outline" style="width:100%;justify-content:center;font-size:0.83rem">Get Started</a>
+      </div>
+      <div class="monthly-card">
+        <div class="monthly-tier">Branch</div>
+        <div class="monthly-name">Branch Package</div>
+        <div class="monthly-price">£199 <small>/mo</small></div>
+        <div class="per-plan">£9.95 per plan</div>
+        <ul class="monthly-features">
+          <li>20 floor plans per month</li>
+          <li>Any property type</li>
+          <li>Priority and rush available</li>
+          <li>Agency branding template included</li>
+          <li>One free revision per plan</li>
+          <li>Dedicated account manager</li>
+        </ul>
+        <a href="#contact" class="btn-outline" style="width:100%;justify-content:center;font-size:0.83rem">Get Started</a>
+      </div>
+    </div>
+
+    <div class="custom-cta-box reveal">
+      <p>Not sure where to start? Whether you've got one property or one hundred, we'll tailor something that works for you.</p>
+      <button class="btn-primary" onclick="openModal('custom-package')">Let us tailor something for you →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     CUSTOM DRAWINGS
+═══════════════════════════════════════════ -->
+<section id="custom" class="custom-section">
+  <div class="container">
+    <div class="reveal">
+      <div class="sec-tag">Custom Drawings</div>
+      <h2>Something a <span class="accent">Little Different?</span></h2>
+      <p class="sec-sub">Not every property fits neatly into a standard plan. If you have a bespoke or unusual request, we're happy to help. Get in touch and we'll work something out.</p>
+    </div>
+    <div class="custom-grid reveal">
+      <div class="custom-card">
+        <div class="custom-icon">🏗️</div>
+        <h4>Development & New Build Plans</h4>
+        <p>Working on a conversion, development project, or new build? We can produce floor plans for planning submissions, sales brochures, or investor presentations.</p>
+      </div>
+      <div class="custom-card">
+        <div class="custom-icon">🏢</div>
+        <h4>Commercial Premises</h4>
+        <p>Need a floor plan for an office, retail space, or commercial unit? We can produce accurate drawings from your measurements or existing plans.</p>
+      </div>
+      <div class="custom-card">
+        <div class="custom-icon">📋</div>
+        <h4>Existing Plan Redraws</h4>
+        <p>Got an old or low-quality floor plan that needs updating or redrawing to a professional standard? We can take what you have and produce a clean, modern version.</p>
+      </div>
+    </div>
+    <div class="reveal" style="text-align:center">
+      <p style="color:var(--mid);font-size:0.9rem;margin-bottom:1.2rem;font-weight:500">If you have something in mind that doesn't fit the above, drop us a message — we'll do our best to help.</p>
+      <button class="btn-primary" onclick="openModal('custom-drawing')">Enquire About a Custom Drawing →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     HOW IT WORKS
+═══════════════════════════════════════════ -->
+<section id="how" class="how-section">
+  <div class="container">
+    <div class="reveal" style="text-align:center;margin-bottom:3.5rem">
+      <div class="sec-tag" style="justify-content:center;margin:0 auto 0.9rem">Process</div>
+      <h2 style="text-align:center">How It <span class="accent">Works</span></h2>
+      <p class="sec-sub" style="text-align:center;margin:0.5rem auto 0">Simple, fast, and no fuss. Here's what to expect.</p>
+    </div>
+    <div class="steps-row reveal">
+      <div class="step-card"><div class="step-num">01</div><div class="step-title">Get in Touch</div><div class="step-desc">Contact us via email or WhatsApp with your property details. We'll confirm your price and get you booked in quickly.</div></div>
+      <div class="step-card"><div class="step-num">02</div><div class="step-title">Submit or Survey</div><div class="step-desc">For floor plans, send measurements or photos. For measured surveys, we visit at an agreed time — evenings and weekends available.</div></div>
+      <div class="step-card"><div class="step-num">03</div><div class="step-title">We Get to Work</div><div class="step-desc">Our team produces your professional drawing. Standard delivery within 48 hours of submission or site visit.</div></div>
+      <div class="step-card"><div class="step-num">04</div><div class="step-title">Review & List</div><div class="step-desc">Check your plan — your first revision is free. Download your files and upload directly to Rightmove, Zoopla, or your council portal.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     FAQ
+═══════════════════════════════════════════ -->
+<section class="faq-section">
+  <div class="container">
+    <div class="reveal" style="margin-bottom:3rem">
+      <div class="sec-tag">FAQ</div>
+      <h2>Common <span class="accent">Questions</span></h2>
+    </div>
+    <div class="faq-accordion reveal">
+      <div class="faq-acc-item">
+        <button class="faq-acc-btn" onclick="toggleFaq(this)">What's the difference between a measured survey and a floor plan?<span class="faq-chevron">▾</span></button>
+        <div class="faq-acc-body"><p>A measured survey involves us visiting the property to take precise measurements — required for council licensing. A coloured floor plan is produced remotely from your measurements or photos, and is ideal for property listings.</p></div>
+      </div>
+      <div class="faq-acc-item">
+        <button class="faq-acc-btn" onclick="toggleFaq(this)">Do I need to be at the property for a survey?<span class="faq-chevron">▾</span></button>
+        <div class="faq-acc-body"><p>Someone needs to provide access, but it doesn't have to be you personally. Tenants, keyholders, or managing agents can let us in — just coordinate access beforehand.</p></div>
+      </div>
+      <div class="faq-acc-item">
+        <button class="faq-acc-btn" onclick="toggleFaq(this)">What format will I receive my plans in?<span class="faq-chevron">▾</span></button>
+        <div class="faq-acc-body"><p>You'll receive high-resolution PDF and JPG files, sized and formatted for Rightmove, Zoopla, and OnTheMarket. Survey drawings are also available in PDF for council submissions.</p></div>
+      </div>
+      <div class="faq-acc-item">
+        <button class="faq-acc-btn" onclick="toggleFaq(this)">Are your plans accepted for HMO licence applications?<span class="faq-chevron">▾</span></button>
+        <div class="faq-acc-body"><p>Yes. Our measured survey drawings are produced to the standard required by local councils, including room dimensions, usage labels, and optional fire and safety markings.</p></div>
+      </div>
+      <div class="faq-acc-item">
+        <button class="faq-acc-btn" onclick="toggleFaq(this)">How do I send my measurements for a floor plan?<span class="faq-chevron">▾</span></button>
+        <div class="faq-acc-body"><p>Via WhatsApp or email — send typed measurements, a hand-drawn sketch, or room photos. We'll work with whatever you have and ask if we need anything else.</p></div>
+      </div>
+      <div class="faq-acc-item">
+        <button class="faq-acc-btn" onclick="toggleFaq(this)">What does the free revision cover?<span class="faq-chevron">▾</span></button>
+        <div class="faq-acc-body"><p>If anything isn't right on your first draft — labels, layout, dimensions — just let us know and we'll fix it at no charge. Additional revisions after that are £5 each.</p></div>
+      </div>
+      <div class="faq-acc-item">
+        <button class="faq-acc-btn" onclick="toggleFaq(this)">Do you cover areas outside Newcastle?<span class="faq-chevron">▾</span></button>
+        <div class="faq-acc-body"><p>Yes. Our core coverage includes Newcastle, Gateshead, Sunderland, Durham, North Tyneside, and South Tyneside. We can travel further — travel charges apply and longer-distance jobs are quoted individually.</p></div>
+      </div>
+      <div class="faq-acc-item">
+        <button class="faq-acc-btn" onclick="toggleFaq(this)">Can I get a floor plan and a measured survey together?<span class="faq-chevron">▾</span></button>
+        <div class="faq-acc-body"><p>Absolutely. Many landlords need both a licensing-ready survey and a polished listing plan. We can produce both from one visit — just mention it when you get in touch.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     CTA
+═══════════════════════════════════════════ -->
+<section class="cta-section" id="contact">
+  <div class="container" style="position:relative;z-index:2;text-align:center">
+    <div class="reveal">
+      <div class="sec-tag" style="justify-content:center;margin:0 auto 0.9rem;color:rgba(255,255,255,0.7)">Get Started</div>
+      <h2 style="color:#fff;margin-bottom:0.6rem">Ready to Move Faster?</h2>
+      <p style="margin-bottom:2rem">Get your professional floor plan or measured survey underway today. We respond quickly.</p>
+      <button class="btn-white" onclick="openModal('quote')">📧 Get a Quote →</button>
+      <div class="cta-contact">
+        <a href="mailto:info@snap-plan.co.uk">✉️ info@snap-plan.co.uk</a>
+        <a href="#surveys">📐 Measured Surveys</a>
+        <a href="#floorplans">🏠 Floor Plans</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════ -->
+<footer>
+  <a href="#" style="text-decoration:none;display:inline-flex;align-items:center;gap:0;line-height:1">
+    <span style="font-family:'Manrope',sans-serif;font-weight:800;font-size:1.4rem;letter-spacing:-0.03em;color:#f26522">Snap</span><span style="font-family:'Manrope',sans-serif;font-weight:800;font-size:1.4rem;letter-spacing:-0.03em;color:rgba(255,255,255,0.65)">Pla</span><svg viewBox="0 0 28 30" height="22" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;margin-bottom:2px"><polygon points="14,1 27,13 1,13" fill="rgba(255,255,255,0.65)"/><rect x="2" y="13" width="24" height="16" fill="rgba(255,255,255,0.65)"/><rect x="9" y="19" width="10" height="10" fill="#181818"/></svg>
+  </a>
+  <div class="foot-links">
+    <a href="#surveys">Measured Surveys</a>
+    <a href="#floorplans">Floor Plans</a>
+    <a href="#monthly">Agency Packages</a>
+    <a href="#custom">Custom Drawings</a>
+    <a href="#how">How It Works</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <p>© 2025 SnapPlan · Newcastle upon Tyne · info@snap-plan.co.uk</p>
+</footer>
+
+<!-- ═══════════════════════════════════════════
+     FULL-PAGE CONTACT PANEL
+═══════════════════════════════════════════ -->
+<div id="contactPanel" style="
+  position:fixed;inset:0;z-index:500;
+  background:#fff;
+  overflow-y:auto;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.28s ease;
+  display:flex;flex-direction:column;
+">
+  <!-- Panel nav -->
+  <div style="
+    background:var(--orange);
+    padding:0 2.5rem;
+    height:68px;
+    display:flex;align-items:center;justify-content:space-between;
+    flex-shrink:0;
+  ">
+    <a href="#" onclick="closePanel();return false;" style="text-decoration:none;display:inline-flex;align-items:center;gap:0;line-height:1">
+      <span style="font-family:'Manrope',sans-serif;font-weight:800;font-size:1.45rem;letter-spacing:-0.03em;color:#fff">Snap</span><span style="font-family:'Manrope',sans-serif;font-weight:800;font-size:1.45rem;letter-spacing:-0.03em;color:rgba(255,255,255,0.72)">Pla</span><svg viewBox="0 0 28 30" height="22" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;margin-bottom:2px"><polygon points="14,1 27,13 1,13" fill="rgba(255,255,255,0.72)"/><rect x="2" y="13" width="24" height="16" fill="rgba(255,255,255,0.72)"/><rect x="9" y="19" width="10" height="10" fill="#f26522"/></svg>
+    </a>
+    <button onclick="closePanel()" style="
+      background:rgba(255,255,255,0.18);border:none;color:#fff;
+      border-radius:8px;padding:0.5rem 1.1rem;
+      font-family:'Manrope',sans-serif;font-weight:700;font-size:0.85rem;
+      cursor:pointer;display:flex;align-items:center;gap:0.4rem;
+      transition:background 0.18s;
+    " onmouseover="this.style.background='rgba(255,255,255,0.28)'" onmouseout="this.style.background='rgba(255,255,255,0.18)'">
+      ✕ &nbsp;Close
+    </button>
+  </div>
+
+  <!-- Panel body -->
+  <div style="flex:1;display:flex;align-items:flex-start;justify-content:center;padding:4rem 2rem">
+    <div style="width:100%;max-width:560px">
+
+      <!-- Success state -->
+      <div id="panelSuccess" style="display:none;text-align:center;padding:4rem 0">
+        <div style="font-size:4rem;margin-bottom:1rem">✅</div>
+        <h2 style="margin-bottom:0.5rem">Message Sent!</h2>
+        <p style="color:var(--mid);font-size:0.95rem;font-weight:500;margin-bottom:2rem">Thanks for getting in touch. We'll get back to you within a few hours during business hours.</p>
+        <button class="btn-primary" onclick="closePanel()">← Back to SnapPlan</button>
+      </div>
+
+      <!-- Form -->
+      <div id="panelFormWrap">
+        <div id="panelBreadcrumb" style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--orange);margin-bottom:0.8rem;display:flex;align-items:center;gap:0.5rem">
+          <span style="width:18px;height:2px;background:var(--orange);display:inline-block;border-radius:2px"></span>
+          <span id="panelTag">Get in Touch</span>
+        </div>
+        <h2 id="panelTitle" style="margin-bottom:0.4rem">Get a Quote</h2>
+        <p id="panelSub" style="font-size:0.95rem;color:var(--mid);margin-bottom:2rem;font-weight:500">Fill in your details below and we'll come back to you with pricing and availability.</p>
+
+        <form id="panelForm" onsubmit="submitPanel(event)">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+            <div class="form-group" style="margin:0"><label>Full Name *</label><input type="text" name="name" placeholder="Your full name" required/></div>
+            <div class="form-group" style="margin:0"><label>Mobile Number *</label><input type="tel" name="mobile" placeholder="07700 000 000" required/></div>
+          </div>
+          <div class="form-group"><label>Email Address *</label><input type="email" name="email" placeholder="you@example.co.uk" required/></div>
+          <div class="form-group" id="panelServiceField">
+            <label>What do you need?</label>
+            <select name="service">
+              <option value="">Select a service…</option>
+              <option value="measured-survey">Measured Survey for Licensing</option>
+              <option value="floor-plan">Coloured Floor Plan</option>
+              <option value="both">Both — Survey & Floor Plan</option>
+              <option value="agency-package">Agency Monthly Package</option>
+              <option value="custom">Custom Drawing</option>
+              <option value="other">Not sure — just want a chat</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Message</label><textarea name="message" placeholder="Tell us about your property, location, any deadlines, or anything else that's useful…" style="min-height:130px"></textarea></div>
+          <p class="form-note" style="margin-bottom:1.2rem">📧 We'll reply to <strong>info@snap-plan.co.uk</strong> — or you can email us directly there too.</p>
+          <button type="submit" class="btn-primary" style="width:100%;justify-content:center;font-size:0.95rem;padding:1rem 2rem">Send Message →</button>
+        </form>
+
+        <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;align-items:center;gap:0.6rem">
+          <span style="font-size:0.8rem;color:var(--mid);font-weight:500">Or email us directly:</span>
+          <a href="mailto:info@snap-plan.co.uk" style="font-size:0.85rem;font-weight:700;color:var(--orange);text-decoration:none">info@snap-plan.co.uk</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  // FAQ accordion
+  function toggleFaq(btn) {
+    const item = btn.closest('.faq-acc-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-acc-item.open').forEach(el => el.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+  // Scroll reveal
+  const revEls = document.querySelectorAll('.reveal');
+  const ro = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('in'), i * 70);
+        ro.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.07 });
+  revEls.forEach(el => ro.observe(el));
+
+  // Smooth scroll
+  function jumpTo(id) {
+    const el = document.querySelector(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // Active tab
+  const sectionIds = ['#surveys','#floorplans','#monthly','#custom','#how','#contact'];
+  const tabs = document.querySelectorAll('.tab-btn');
+  window.addEventListener('scroll', () => {
+    let cur = 0;
+    sectionIds.forEach((s, i) => {
+      const el = document.querySelector(s);
+      if (el && window.scrollY >= el.offsetTop - 180) cur = i;
+    });
+    tabs.forEach((t, i) => t.classList.toggle('active', i === cur));
+  }, { passive: true });
+
+  // Contact panel
+  function openModal(type) {
+    const panel    = document.getElementById('contactPanel');
+    const title    = document.getElementById('panelTitle');
+    const sub      = document.getElementById('panelSub');
+    const tag      = document.getElementById('panelTag');
+    const svcField = document.getElementById('panelServiceField');
+    const select   = panel.querySelector('select[name="service"]');
+
+    // Reset states
+    document.getElementById('panelSuccess').style.display   = 'none';
+    document.getElementById('panelFormWrap').style.display  = 'block';
+    document.getElementById('panelForm').reset();
+
+    if (type === 'quote') {
+      tag.textContent   = 'Get a Quote';
+      title.textContent = 'Get a Quote';
+      sub.textContent   = 'Fill in your details below and we\'ll come back to you with pricing and availability.';
+      svcField.style.display = 'block';
+    } else if (type === 'custom-drawing') {
+      tag.textContent   = 'Custom Drawings';
+      title.textContent = 'Enquire About a Custom Drawing';
+      sub.textContent   = 'Tell us what you need and we\'ll come back to you with options and a price.';
+      svcField.style.display = 'none';
+      if (select) select.value = 'custom';
+    } else if (type === 'agent') {
+      tag.textContent   = 'Multiple Properties';
+      title.textContent = 'Let\'s Talk — Multiple Properties';
+      sub.textContent   = 'Tell us about your portfolio and we\'ll put together a package that works for you.';
+      svcField.style.display = 'block';
+      if (select) select.value = 'agency-package';
+    } else if (type === 'custom-package') {
+      tag.textContent   = 'Agency Packages';
+      title.textContent = 'Let Us Tailor Something for You';
+      sub.textContent   = 'Not sure which package fits? Tell us what you need and we\'ll work something out.';
+      svcField.style.display = 'block';
+      if (select) select.value = 'agency-package';
+    }
+
+    panel.style.opacity       = '1';
+    panel.style.pointerEvents = 'all';
+    document.body.style.overflow = 'hidden';
+    panel.scrollTop = 0;
+  }
+
+  function closePanel() {
+    const panel = document.getElementById('contactPanel');
+    panel.style.opacity       = '0';
+    panel.style.pointerEvents = 'none';
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
+
+  function submitPanel(e) {
+    e.preventDefault();
+    document.getElementById('panelFormWrap').style.display = 'none';
+    document.getElementById('panelSuccess').style.display  = 'block';
+  }
+</script>
+</body>
+</html>
